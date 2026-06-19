@@ -1,0 +1,23 @@
+
+local disasterManagerModule = script.Parent:FindFirstChild("DisasterManager")
+if not disasterManagerModule then
+	warn("MainGameLoop: 'DisasterManager' module not found in ServerScriptService!")
+	return
+end
+
+local DisasterManager = require(disasterManagerModule)
+local GameLoop = DisasterManager.new()
+
+
+task.spawn(function()
+	while true do
+		print("--- New Intermission ---")
+		task.wait(5) 
+
+		GameLoop:StartRound()
+
+		task.wait(10) 
+
+		GameLoop:EndRound()
+	end
+end)
