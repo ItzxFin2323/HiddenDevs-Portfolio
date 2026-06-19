@@ -1,0 +1,77 @@
+local DisasterManager = {}
+DisasterManager.__index = DisasterManager
+
+
+local ServerStorage = game:GetService("ServerStorage")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local Players = game:GetService("Players")
+
+
+function DisasterManager.new()
+	local self = setmetatable({}, DisasterManager)
+
+	self.ActiveDisaster = nil
+	self.IsRoundActive = false
+
+
+	self.DisasterFolder = ServerStorage:FindFirstChild("Disasters")
+	if not self.DisasterFolder then
+		warn("DisasterManager: 'Disasters' folder not found in ServerStorage!")
+	end
+
+	return self
+end
+
+
+function DisasterManager:ChooseDisaster()
+	local availableDisasters = self.DisasterFolder:GetChildren()
+
+	if #availableDisasters == 0 then
+		warn("DisasterManager: No disasters found in ServerStorage!")
+		return nil
+	end
+
+	local randomIndex = math.random(1, #availableDisasters)
+	return availableDisasters[randomIndex]
+end
+
+
+function DisasterManager:RevealDisaster(disasterName)
+	print("System: Preparing for " .. disasterName .. "...")
+
+	task.wait(3) -- Suspense delay
+end
+
+
+function DisasterManager:StartRound()
+	if self.IsRoundActive then return end
+	self.IsRoundActive = true
+
+	local disasterTemplate = self:ChooseDisaster()
+	if not disasterTemplate then
+		self.IsRoundActive = false
+		return
+	end
+
+	self:RevealDisaster(disasterTemplate.Name)
+
+
+	self.ActiveDisaster = disasterTemplate:Clone()
+	self.ActiveDisaster.Parent = workspace
+	print("System: " .. disasterTemplate.Name .. " has spawned!")
+end
+
+
+function DisasterManager:EndRound()
+	if not self.IsRoundActive then return end
+
+	if self.ActiveDisaster then
+		self.ActiveDisaster:Destroy()
+		self.ActiveDisaster = nil
+	end
+
+	self.IsRoundActive = false
+	print("System: Round over. Disaster cleaned up.")
+end
+
+return DisasterManager
